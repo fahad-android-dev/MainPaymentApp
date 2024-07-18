@@ -1,0 +1,438 @@
+<!-- fragment_reconcile.xml -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <!-- Define data binding variables if needed -->
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/layoutToolbar"
+            layout="@layout/layout_toolbar" />
+
+        <ImageView
+            android:id="@+id/ivCode"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_40sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layoutToolbar" />
+
+
+        <TextView
+            android:id="@+id/txtCompleted"
+            style="@style/TextStyleCenterMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textColor="@color/green_color"
+            android:textAllCaps="true"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivCode" />
+
+        <TextView
+            android:id="@+id/txtId"
+            style="@style/TextStyleCenterRegular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtCompleted" />
+
+        <TextView
+            android:id="@+id/txtDateTime"
+            style="@style/TextStyleCenterRegular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtId" />
+
+        <LinearLayout
+            android:id="@+id/linDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtDateTime">
+
+            <TextView
+                android:id="@+id/txtType"
+                style="@style/TextStyleCenterSemiBold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/type"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp" />
+
+            <TextView
+                android:id="@+id/txtCount"
+                style="@style/TextStyleCenterSemiBold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/count"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp" />
+
+            <TextView
+                android:id="@+id/txtTotal"
+                style="@style/TextStyleCenterSemiBold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/total"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewDetails"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@color/color_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linDetails" />
+
+        <LinearLayout
+            android:id="@+id/linPurchase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewDetails">
+
+            <TextView
+                android:id="@+id/txtPurchase"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/purchase"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp" />
+
+            <TextView
+                android:id="@+id/txtPurchaseCount"
+                style="@style/TextStyleCenterSemiBold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1" />
+
+            <TextView
+                android:id="@+id/txtPurchaseTotal"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1 SAR" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewPurchase"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@color/color_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linPurchase" />
+
+        <LinearLayout
+            android:id="@+id/linRefund"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewPurchase">
+
+            <TextView
+                android:id="@+id/txtRefund"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/refund"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp" />
+
+            <TextView
+                android:id="@+id/txtRefundCount"
+                style="@style/TextStyleCenterSemiBold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1" />
+
+            <TextView
+                android:id="@+id/txtRefundTotal"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1 SAR" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewRefund"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@color/color_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linRefund" />
+
+        <LinearLayout
+            android:id="@+id/linPurchaseReversal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewRefund">
+
+            <TextView
+                android:id="@+id/txtPurchaseReversal"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/purchase_reversal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp" />
+
+            <TextView
+                android:id="@+id/txtPurchaseReversalCount"
+                style="@style/TextStyleCenterSemiBold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1" />
+
+            <TextView
+                android:id="@+id/txtPurchaseReversalTotal"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1 SAR" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewPurchaseReversal"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@color/color_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linPurchaseReversal" />
+
+        <LinearLayout
+            android:id="@+id/linRefundReversal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewPurchaseReversal">
+
+            <TextView
+                android:id="@+id/txtRefundReversal"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/refund_reversal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp" />
+
+            <TextView
+                android:id="@+id/txtRefundReversalCount"
+                style="@style/TextStyleCenterSemiBold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1" />
+
+            <TextView
+                android:id="@+id/txtRefundReversalTotal"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1 SAR" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewRefundReversal"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@color/color_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linRefundReversal" />
+
+        <LinearLayout
+            android:id="@+id/linTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewRefundReversal">
+
+            <TextView
+                android:id="@+id/txtTotalType"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/total"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp" />
+
+            <TextView
+                android:id="@+id/txtTotalTypeCount"
+                style="@style/TextStyleCenterSemiBold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1" />
+
+            <TextView
+                android:id="@+id/txtTotalTypeTotal"
+                style="@style/TextStyleCenterRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/_10ssp"
+                tools:text="1 SAR" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewTotalType"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@color/color_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linTotal" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
