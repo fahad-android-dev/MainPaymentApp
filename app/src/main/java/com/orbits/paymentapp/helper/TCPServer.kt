@@ -47,6 +47,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
         try {
             serverSocket = ServerSocket(port)
             println("TCP Server started on port $port")
+            println("TCP Server address ${serverSocket?.inetAddress?.hostAddress}")
             while (true) {
                 val clientSocket = serverSocket?.accept()
                 val clientHandler = ClientHandler(clientSocket)

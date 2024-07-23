@@ -7,10 +7,13 @@ import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.databinding.DataBindingUtil
 import com.google.gson.Gson
@@ -27,6 +30,7 @@ import com.orbits.paymentapp.helper.Global.showSnackBar
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
 import com.orbits.paymentapp.helper.PrefUtils.isCodeVerified
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
+import com.orbits.paymentapp.helper.ServerService
 import com.orbits.paymentapp.helper.TCPServer
 import com.orbits.paymentapp.helper.WebSocketClient
 import com.orbits.paymentapp.helper.helper_model.UserDataModel
@@ -69,9 +73,28 @@ class MainActivity : BaseActivity(), MessageListener {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
 
-        initializeSocket()
+        startServerService()
+
         initializeToolbar()
         initializeNearPay()
+    }
+
+    private fun startServerService(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
+
+        Intent(applicationContext, ServerService::class.java).also { intent ->
+            intent.action = ServerService.Actions.START.toString()
+            startService(intent)
+            println("here is service started")
+            initializeSocket()
+        }
+
     }
 
     private fun initializeToolbar() {
@@ -129,8 +152,13 @@ class MainActivity : BaseActivity(), MessageListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        tcpServer.stop()
-        webSocketClient.stop()
+        /*Intent(applicationContext, ServerService::class.java).also { intent ->
+            intent.action = ServerService.Actions.STOP.toString()
+            startService(intent)
+            println("here is service started")
+            tcpServer.stop()
+            webSocketClient.stop()
+        }*/
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -244,11 +272,10 @@ class MainActivity : BaseActivity(), MessageListener {
                     val jsonObject = JsonObject()
                     println("here is transaction data $transactionData")
                     jsonObject.add("transactionData", gson.toJsonTree(transactionData))
-                    arrListClients.forEach {
-                        sendMessageToWebSocketClient(it, jsonObject)
-                    }
+                    sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
                     moveTaskToBack(true)
                 }
+
 
                 override fun onPurchaseFailed(purchaseFailure: PurchaseFailure) {
                     when (purchaseFailure) {
@@ -260,10 +287,7 @@ class MainActivity : BaseActivity(), MessageListener {
                                 "transactionData",
                                 gson.toJsonTree(purchaseFailure.transactionData)
                             )
-                            arrListClients.forEach {
-                                sendMessageToWebSocketClient(it, jsonObject)
-                            }
-                           // showFailureNotification(this@MainActivity,"Payment", "Payment Failed")
+                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
 
                         }
@@ -271,63 +295,42 @@ class MainActivity : BaseActivity(), MessageListener {
                         is PurchaseFailure.PurchaseRejected -> {
 
                             println("here is 222")
-                            arrListClients.forEach {
-                                println("here is ${purchaseFailure.message}")
-                                val jsonObject = JsonObject()
-                                jsonObject.addProperty("status_message", "failure")
-                                jsonObject.addProperty("description", purchaseFailure.message)
-                                println("here is purchase rejected")
-                                sendMessageToWebSocketClient(it, jsonObject)
-                            }
-
-                          //  showFailureNotification(this@MainActivity,"Payment", "Payment Failed")
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message", "failure")
+                            jsonObject.addProperty("description", purchaseFailure.message)
+                            println("here is purchase rejected")
+                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
 
                         is PurchaseFailure.AuthenticationFailed -> {
                             nearpay.updateAuthentication(AuthenticationData.Jwt("JWT HERE"))
-                            arrListClients.forEach {
-                                val jsonObject = JsonObject()
-                                jsonObject.addProperty("status_message", "failure")
-                                println("here is purchase rejected ${jsonObject}")
-                                sendMessageToWebSocketClient(it, jsonObject)
-                            }
-
-                           // showFailureNotification(this@MainActivity,"Payment", "Payment Failed")
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message", "failure")
+                            println("here is purchase rejected ${jsonObject}")
+                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
 
                         is PurchaseFailure.InvalidStatus -> {
                             println("here is 4444")
-                            arrListClients.forEach {
-                                val jsonObject = JsonObject()
-                                jsonObject.addProperty("status_message", "failure")
-                                sendMessageToWebSocketClient(it, jsonObject)
-                            }
-
-                           // showFailureNotification(this@MainActivity,"Payment", "Payment Failed")
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message", "failure")
+                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
 
                         is PurchaseFailure.GeneralFailure -> {
-                            arrListClients.forEach {
-                                val jsonObject = JsonObject()
-                                jsonObject.addProperty("status_message", "failure")
-                                sendMessageToWebSocketClient(it, jsonObject)
-                            }
-
-                          //  showFailureNotification(this@MainActivity,"Payment", "Payment Failed")
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message", "failure")
+                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
 
                         is PurchaseFailure.UserCancelled -> {
-                            arrListClients.forEach {
-                                val jsonObject = JsonObject()
-                                jsonObject.addProperty("status_message", "failure")
-                                sendMessageToWebSocketClient(it, jsonObject)
-                            }
-
-                           // showFailureNotification(this@MainActivity,"Payment", "Payment Failed")
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message", "failure")
+                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
                     }
