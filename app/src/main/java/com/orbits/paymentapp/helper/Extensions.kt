@@ -31,8 +31,10 @@ import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.util.Pair
@@ -676,6 +678,18 @@ object Extensions {
             block()
         } else {
             return
+        }
+    }
+
+    fun showPassword(context: Context,editText: EditText,imageView: ImageView){
+        if (editText.transformationMethod == null) {
+            editText.transformationMethod = PasswordTransformationMethod()
+            editText.setSelection(editText.text?.length ?: 0)
+            imageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_eye))
+        } else {
+            editText.transformationMethod = null
+            editText.setSelection(editText.text?.length ?: 0)
+            imageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_eye_closed))
         }
     }
 

@@ -16,6 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.orbits.paymentapp.R
@@ -26,13 +27,20 @@ import com.orbits.paymentapp.helper.BaseActivity
 import com.orbits.paymentapp.helper.Constants
 import com.orbits.paymentapp.helper.Dialogs
 import com.orbits.paymentapp.helper.Extensions.asDouble
+import com.orbits.paymentapp.helper.Global
 import com.orbits.paymentapp.helper.Global.showSnackBar
+import com.orbits.paymentapp.helper.PrefUtils.getAppPassword
+import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
 import com.orbits.paymentapp.helper.PrefUtils.isCodeVerified
+import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
+import com.orbits.paymentapp.helper.PrefUtils.setMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
 import com.orbits.paymentapp.helper.ServerService
 import com.orbits.paymentapp.helper.TCPServer
 import com.orbits.paymentapp.helper.WebSocketClient
+import com.orbits.paymentapp.helper.helper_model.AppMasterKeyModel
+import com.orbits.paymentapp.helper.helper_model.PasswordModel
 import com.orbits.paymentapp.helper.helper_model.UserDataModel
 import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
@@ -73,8 +81,27 @@ class MainActivity : BaseActivity(), MessageListener {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
 
-        startServerService()
 
+        println("here is 111 ${getMasterKey()?.masterKey}")
+        if (getMasterKey()?.masterKey == null){
+            Global.getRandomDeviceId()
+            setMasterKey(
+                result = AppMasterKeyModel(
+                    masterKey = Global.getRandomDeviceId()
+                )
+            )
+
+        }
+        if (getAppPassword()?.appPassword == null){
+            setAppPassword(
+                result = PasswordModel(
+                    appPassword = "1234"
+                )
+            )
+        }
+
+
+        startServerService()
         initializeToolbar()
         initializeNearPay()
     }
@@ -100,17 +127,46 @@ class MainActivity : BaseActivity(), MessageListener {
     private fun initializeToolbar() {
         setUpToolbar(
             binding.layoutToolbar,
-            title = getString(R.string.app_name),
+            title = "Aflak",
             isBackArrow = false,
             toolbarClickListener = object : CommonInterfaceClickEvent {
                 override fun onToolBarListener(type: String) {
                     if (type == Constants.TOOLBAR_ICON_ONE) {
+                        val appSalt = byteArrayOf(17, 43, 99, 82, 55, 28, 40, 90)
+                        val masterPassword =  Global.getMasterKey(this@MainActivity,appSalt)
+
+                        println("here is master password $masterPassword")
+
                         Dialogs.showPasswordDialog(
                             activity = this@MainActivity,
                             alertDialogInterface = object : AlertDialogInterface {
                                 override fun onYesClick() {
                                     val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                                     startActivity(intent)
+                                }
+
+                                override fun onMasterYesClick() {
+                                    val code = Global.getRandomDeviceId()
+                                    setMasterKey(
+                                        result = AppMasterKeyModel(
+                                            masterKey = code
+                                        )
+                                    )
+                                    Dialogs.showChangePasswordDialog(
+                                        activity = this@MainActivity,
+                                        alertDialogInterface = object : AlertDialogInterface {
+                                            override fun onSubmitPasswordClick(password: String) {
+                                                setAppPassword(
+                                                    result = PasswordModel(
+                                                        appPassword = password
+                                                    )
+                                                )
+                                                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                                                startActivity(intent)
+                                            }
+
+                                        }
+                                    )
                                 }
                             }
                         )

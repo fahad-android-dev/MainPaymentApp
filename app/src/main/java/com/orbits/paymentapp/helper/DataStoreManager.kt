@@ -7,12 +7,14 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
 import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.APP
-import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.STORE
-import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.USER_DEEPLINK_DATA
+import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.MASTER_KEY
+import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.PASSWORD
 import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.USER_REMEMBER_DATA
 import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.USER_RESPONSE_DATA
 import com.orbits.paymentapp.helper.helper_model.AppConfigModel
+import com.orbits.paymentapp.helper.helper_model.AppMasterKeyModel
 import com.orbits.paymentapp.helper.helper_model.DeepLinkModel
+import com.orbits.paymentapp.helper.helper_model.PasswordModel
 import com.orbits.paymentapp.helper.helper_model.StoreDataModel
 import com.orbits.paymentapp.helper.helper_model.UserRememberDataModel
 import com.orbits.paymentapp.helper.helper_model.UserResponseModel
@@ -30,22 +32,12 @@ class DataStoreManager(val context: Context) {
     private object PreferencesKeys {
         val USER_RESPONSE_DATA = stringPreferencesKey("response_data")
         val USER_REMEMBER_DATA = stringPreferencesKey("user_remember_data")
-        val USER_DEEPLINK_DATA = stringPreferencesKey("deeplink_response_data")
+        val MASTER_KEY = stringPreferencesKey("master_key")
+        val PASSWORD = stringPreferencesKey("password")
         val STORE = stringPreferencesKey("store")
         val APP = stringPreferencesKey("application")
     }
 
-    suspend fun saveDeeplinkModel(responseModel: DeepLinkModel?) {
-        instance.edit { preferences ->
-            preferences[USER_DEEPLINK_DATA] = Gson().toJson(responseModel)
-        }
-    }
-
-    suspend fun getDeeplinkModel() : Flow<DeepLinkModel?> {
-        return instance.data.map { preferences ->
-            Gson().fromJson(preferences[USER_DEEPLINK_DATA] ?: "" , DeepLinkModel::class.java)
-        }
-    }
 
     suspend fun saveAppConfig(responseModel: AppConfigModel) {
         instance.edit { preferences ->
@@ -59,35 +51,48 @@ class DataStoreManager(val context: Context) {
         }
     }
 
+    suspend fun saveAppPassword(responseModel: PasswordModel) {
+        instance.edit { preferences ->
+            preferences[PASSWORD] = Gson().toJson(responseModel)
+        }
+    }
+
+    fun getAppPassword(): Flow<PasswordModel?> {
+        return instance.data.map { preferences ->
+            val gson = Gson()
+            val responseData = preferences[PASSWORD] ?: ""
+            val dataObject = gson.fromJson(responseData, PasswordModel::class.java)
+            dataObject
+        }
+    }
+
+    suspend fun saveMasterKey(responseModel: AppMasterKeyModel) {
+        instance.edit { preferences ->
+            preferences[MASTER_KEY] = Gson().toJson(responseModel)
+        }
+    }
+
     suspend fun saveUserData(responseModel: UserResponseModel?) {
         instance.edit { preferences ->
             preferences[USER_RESPONSE_DATA] = Gson().toJson(responseModel)
         }
     }
 
-    suspend fun saveUserRememberData(responseModel: UserRememberDataModel) {
-        instance.edit { preferences ->
-            preferences[USER_REMEMBER_DATA] = Gson().toJson(responseModel)
-        }
-    }
-
-    suspend fun saveStore(storeDataModel: StoreDataModel) {
-        instance.edit { preferences ->
-            preferences[STORE] = Gson().toJson(storeDataModel)
-        }
-    }
-
-    suspend fun getStore() : Flow<StoreDataModel>{
-        return instance.data.map { preferences ->
-            Gson().fromJson(preferences[STORE] ?: "" , StoreDataModel::class.java)
-        }
-    }
 
     fun getUserData(): Flow<UserResponseModel?> {
         return instance.data.map { preferences ->
             val gson = Gson()
             val responseData = preferences[USER_RESPONSE_DATA] ?: ""
             val dataObject = gson.fromJson(responseData, UserResponseModel::class.java)
+            dataObject
+        }
+    }
+
+    fun getMasterKey(): Flow<AppMasterKeyModel?> {
+        return instance.data.map { preferences ->
+            val gson = Gson()
+            val responseData = preferences[MASTER_KEY] ?: ""
+            val dataObject = gson.fromJson(responseData, AppMasterKeyModel::class.java)
             dataObject
         }
     }

@@ -32,31 +32,45 @@
 
                 <TextView
                     android:id="@+id/txtGenerateCode"
-                    style="@style/TextStyleStartSemiBold"
+                    style="@style/TextStyleStartMedium"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/screen_margin"
                     android:layout_marginTop="@dimen/_20sdp"
                     android:layout_marginBottom="@dimen/_10sdp"
                     android:text="Pairing Code"
-                    android:textSize="@dimen/medium_text_size"
+                    android:textSize="@dimen/biggest_text_size"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/txtReconcile"
-                    style="@style/TextStyleStartSemiBold"
+                    style="@style/TextStyleStartMedium"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/screen_margin"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:layout_marginBottom="@dimen/_10sdp"
                     android:text="Reconcile"
-                    android:textSize="@dimen/medium_text_size"
+                    android:textSize="@dimen/biggest_text_size"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/txtGenerateCode" />
+
+                <TextView
+                    android:id="@+id/txtChangePassword"
+                    style="@style/TextStyleStartMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/screen_margin"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginBottom="@dimen/_10sdp"
+                    android:text="@string/change_password"
+                    android:textSize="@dimen/biggest_text_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtReconcile" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -13,8 +13,11 @@ import com.orbits.paymentapp.databinding.ActivitySettingsBinding
 import com.orbits.paymentapp.helper.AlertDialogInterface
 import com.orbits.paymentapp.helper.BaseActivity
 import com.orbits.paymentapp.helper.Dialogs
+import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
+import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
+import com.orbits.paymentapp.helper.helper_model.PasswordModel
 import com.orbits.paymentapp.helper.helper_model.UserDataModel
 import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
@@ -51,6 +54,22 @@ class SettingsActivity : BaseActivity() {
         binding.txtReconcile.setOnClickListener {
             val intent = Intent(this@SettingsActivity, ReconcileActivity::class.java)
             startActivity(intent)
+        }
+
+        binding.txtChangePassword.setOnClickListener {
+            Dialogs.showChangeAllPasswordDialog(
+                activity = this,
+                alertDialogInterface = object : AlertDialogInterface{
+                    override fun onSubmitPasswordClick(password: String) {
+                        println("here is 222 ${getMasterKey()?.masterKey}")
+                        setAppPassword(
+                            result = PasswordModel(
+                                appPassword = password
+                            )
+                        )
+                    }
+                }
+            )
         }
     }
 

@@ -3,8 +3,10 @@ package com.orbits.paymentapp.helper
 import android.content.Context
 import com.orbits.paymentapp.helper.Extensions.asString
 import com.orbits.paymentapp.helper.helper_model.AppConfigModel
+import com.orbits.paymentapp.helper.helper_model.AppMasterKeyModel
 import com.orbits.paymentapp.helper.helper_model.DeepLinkModel
 import com.orbits.paymentapp.helper.helper_model.Device
+import com.orbits.paymentapp.helper.helper_model.PasswordModel
 import com.orbits.paymentapp.helper.helper_model.StoreDataModel
 import com.orbits.paymentapp.helper.helper_model.UserRememberDataModel
 import com.orbits.paymentapp.helper.helper_model.UserResponseModel
@@ -73,6 +75,26 @@ object PrefUtils {
     fun Context.getAppConfig(): AppConfigModel? {
         val dt = DataStoreManager(this)
         return runBlocking { dt.getAppConfig().firstOrNull() }
+    }
+
+    fun Context.setAppPassword(result: PasswordModel) {
+        val dt = DataStoreManager(this)
+        runBlocking { dt.saveAppPassword(result) }
+    }
+
+    fun Context.getAppPassword(): PasswordModel? {
+        val dt = DataStoreManager(this)
+        return runBlocking { dt.getAppPassword().first() }
+    }
+
+    fun Context.setMasterKey(result: AppMasterKeyModel) {
+        val dt = DataStoreManager(this)
+        runBlocking { dt.saveMasterKey(result) }
+    }
+
+    fun Context.getMasterKey(): AppMasterKeyModel? {
+        val dt = DataStoreManager(this)
+        return runBlocking { dt.getMasterKey().first() }
     }
 
     fun Context.isEnglishLanguage(): Boolean {

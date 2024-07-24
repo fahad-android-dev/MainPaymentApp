@@ -4,10 +4,15 @@ import android.annotation.SuppressLint
 import android.app.ActionBar
 import android.app.Activity
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Typeface
+import android.provider.Settings
 import android.text.SpannableString
-import android.util.*
-import android.view.*
+import android.util.DisplayMetrics
+import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -18,7 +23,12 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.orbits.paymentapp.R
 import com.orbits.paymentapp.databinding.LayoutSnackBarBinding
-import java.util.*
+import com.orbits.paymentapp.helper.PrefUtils.getAppConfig
+import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
+import java.io.UnsupportedEncodingException
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.util.Random
 
 
 @SuppressLint("StaticFieldLeak")
@@ -115,6 +125,76 @@ object Global {
                 }
             })
         }
+    }
+
+
+    fun getMasterKey(context: Context?, b: ByteArray?): String {
+        var masterKey = ""
+        val randomCode = context?.getMasterKey()?.masterKey ?: ""
+        println("here is random code $randomCode")
+        println("here is masterkey $masterKey")
+        try {
+            masterKey = getHash(
+                (randomCode.substring(11)
+                        + String((b)!!, charset("UTF-8")))
+            )
+            Log.e("device id::", masterKey.substring(masterKey.length - 8))
+            Log.e("device id 444 ::", context?.let { getDeviceId(it) } ?: "")
+            Log.e("device id 555 ::", getRandomDeviceId())
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+        return masterKey.substring(masterKey.length - 8)
+    }
+
+    fun getHash(str: String): String {
+        var strHash = ""
+        try {
+            val msgDigest = MessageDigest.getInstance("SHA-256")
+            // msgDigest.update(str.getBytes());
+            msgDigest.update(str.toByteArray(charset("UTF-8")))
+            val hashBytes = msgDigest.digest()
+            val hexString = StringBuffer()
+            for (i in hashBytes.indices) {
+                val hex = Integer.toHexString(0xff and hashBytes[i].toInt())
+                if (hex.length == 1) hexString.append('0')
+                hexString.append(hex)
+            }
+            strHash = hexString.toString()
+        } catch (e: NoSuchAlgorithmException) {
+            // TODO Auto-generated catch block
+            // e.printStackTrace();
+            strHash = ""
+        } catch (e: UnsupportedEncodingException) {
+            strHash = ""
+        } catch (e: Exception) {
+            strHash = ""
+        }
+        return strHash
+    }
+
+
+    fun getRandomDeviceId(): String {
+        val randomId = generateRandomAlphanumeric(16)
+        return randomId
+    }
+
+    private fun generateRandomAlphanumeric(length: Int): String {
+        val characters = "0123456789"
+        val random = Random()
+        val sb = StringBuilder(length)
+        for (i in 0 until length) {
+            sb.append(characters[random.nextInt(characters.length)])
+        }
+        return sb.toString()
+    }
+
+    @SuppressLint("HardwareIds")
+    fun getDeviceId(ctx: Context): String {
+        return Settings.Secure.getString(
+            ctx.contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
     }
 
 }

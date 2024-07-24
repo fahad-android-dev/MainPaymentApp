@@ -4,7 +4,8 @@ import android.view.View
 
 interface AlertDialogInterface {
     fun onYesClick() {}
+    fun onMasterYesClick() {}
     fun onNoClick() {}
     fun onCloseDialog() {}
-    fun onSubmitPasswordClick(emailID: String, view: View) {}
+    fun onSubmitPasswordClick(password: String) {}
 }
