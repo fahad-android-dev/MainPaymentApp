@@ -38,7 +38,7 @@
                     android:layout_marginHorizontal="@dimen/screen_margin"
                     android:layout_marginTop="@dimen/_20sdp"
                     android:layout_marginBottom="@dimen/_10sdp"
-                    android:text="Pairing Code"
+                    android:text="@string/pairing_code"
                     android:textSize="@dimen/biggest_text_size"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -52,7 +52,7 @@
                     android:layout_marginHorizontal="@dimen/screen_margin"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:layout_marginBottom="@dimen/_10sdp"
-                    android:text="Reconcile"
+                    android:text="@string/reconcile"
                     android:textSize="@dimen/biggest_text_size"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -71,6 +71,20 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/txtReconcile" />
+
+                <TextView
+                    android:id="@+id/txtChangeLanguage"
+                    style="@style/TextStyleStartMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/screen_margin"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginBottom="@dimen/_10sdp"
+                    android:text="@string/change_language"
+                    android:textSize="@dimen/biggest_text_size"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtChangePassword" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -50,7 +50,6 @@ object Dialogs {
             customDialog?.setCanceledOnTouchOutside(isCancellable ?: true)
             customDialog?.setCancelable(isCancellable ?: true)
 
-            binding.btnAlertPositive.text = "Confirm"
 
             val appSalt = byteArrayOf(17, 43, 99, 82, 55, 28, 40, 90)
             val masterPassword =  Global.getMasterKey(activity,appSalt)

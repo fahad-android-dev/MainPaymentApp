@@ -1,5 +1,6 @@
 package com.orbits.paymentapp.mvvm.settings
 
+import AppNavigation.navigateToMain
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -13,6 +14,8 @@ import com.orbits.paymentapp.databinding.ActivitySettingsBinding
 import com.orbits.paymentapp.helper.AlertDialogInterface
 import com.orbits.paymentapp.helper.BaseActivity
 import com.orbits.paymentapp.helper.Dialogs
+import com.orbits.paymentapp.helper.Dialogs.showCustomAlert
+import com.orbits.paymentapp.helper.LocaleHelper
 import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
 import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
@@ -36,7 +39,7 @@ class SettingsActivity : BaseActivity() {
     private fun initializeToolbar() {
         setUpToolbar(
             binding.layoutToolbar,
-            title = "Settings",
+            title = getString(R.string.settings),
             isBackArrow = true,
             toolbarClickListener = object : CommonInterfaceClickEvent {
                 override fun onToolBarListener(type: String) {
@@ -71,6 +74,27 @@ class SettingsActivity : BaseActivity() {
                 }
             )
         }
+
+        binding.txtChangeLanguage.setOnClickListener {
+            showChangeLanguageAlert()
+        }
+    }
+
+    private fun showChangeLanguageAlert() {
+        showCustomAlert(
+            activity = this@SettingsActivity,
+            title = getString(R.string.alert_title_lang),
+            msg = resources.getString(R.string.alert_language),
+            yesBtn = resources.getString(R.string.yes_lang),
+            noBtn = resources.getString(R.string.no_lang),
+            alertDialogInterface = object : AlertDialogInterface {
+                override fun onYesClick() {
+                    LocaleHelper.changeLanguage(this@SettingsActivity)
+                    navigateToMain{}
+                }
+
+                override fun onNoClick() {}
+            })
     }
 
     private fun showGenerateCodeDialog() {
@@ -79,11 +103,11 @@ class SettingsActivity : BaseActivity() {
             code = getUserDataResponse()?.code ?: "",
             alertDialogInterface = object : AlertDialogInterface {
                 override fun onYesClick() {
-                    Dialogs.showCustomAlert(
+                    showCustomAlert(
                         activity = this@SettingsActivity,
-                        msg = "Are you sure you want to generate a new code?",
-                        yesBtn = "Yes",
-                        noBtn = "No",
+                        msg = getString(R.string.are_you_sure_you_want_to_generate_a_new_code),
+                        yesBtn = getString(R.string.yes),
+                        noBtn = getString(R.string.label_no),
                         alertDialogInterface = object : AlertDialogInterface {
                             override fun onYesClick() {
                                 setUserDataResponse(
