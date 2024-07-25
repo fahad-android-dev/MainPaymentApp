@@ -1,5 +1,6 @@
 package com.orbits.paymentapp.mvvm.main
 
+import android.app.ActivityManager
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -33,6 +34,7 @@ import com.orbits.paymentapp.helper.PrefUtils.getAppPassword
 import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
 import com.orbits.paymentapp.helper.PrefUtils.isCodeVerified
+import com.orbits.paymentapp.helper.PrefUtils.isEnglishLanguage
 import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
 import com.orbits.paymentapp.helper.PrefUtils.setMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
@@ -107,21 +109,33 @@ class MainActivity : BaseActivity(), MessageListener {
     }
 
     private fun startServerService(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                0
-            )
-        }
+        val serviceRunning = isServiceRunning(ServerService::class.java)
+        if (!serviceRunning){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+            }
 
-        Intent(applicationContext, ServerService::class.java).also { intent ->
-            intent.action = ServerService.Actions.START.toString()
-            startService(intent)
-            println("here is service started")
-            initializeSocket()
+            Intent(applicationContext, ServerService::class.java).also { intent ->
+                intent.action = ServerService.Actions.START.toString()
+                startService(intent)
+                println("here is service started")
+                initializeSocket()
+            }
         }
+    }
 
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun initializeToolbar() {
@@ -424,11 +438,15 @@ class MainActivity : BaseActivity(), MessageListener {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val drawable = resources.getDrawable(R.drawable.ic_app_logo, null)
-        val bitmap = (drawable as BitmapDrawable).bitmap
+
 
         val customNotificationLayout = RemoteViews(context.packageName, R.layout.layout_notification).apply {
-            setImageViewResource(R.id.txtTitle, R.drawable.ic_notification_img)
+            if (isEnglishLanguage()){
+                setImageViewResource(R.id.txtTitle, R.drawable.ic_notification_img)
+            }else {
+                setImageViewResource(R.id.txtTitle, R.drawable.ic_ar_notification)
+            }
+
         }
 
         // Create the notification using NotificationCompat.Builder
