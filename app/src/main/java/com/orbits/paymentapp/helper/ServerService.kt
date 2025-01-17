@@ -6,8 +6,11 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.orbits.paymentapp.R
+import com.orbits.paymentapp.helper.PrefUtils.setServiceData
+import com.orbits.paymentapp.helper.helper_model.ServiceDataModel
 
 class ServerService : Service() {
+
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -31,8 +34,10 @@ class ServerService : Service() {
             .setSmallIcon(R.drawable.ic_app_logo)
             .setContentTitle("Aflak")
             .setContentText("Server is Running")
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .build()
-        startForeground(1,notification)
+        startForeground(2,notification)
     }
 
 

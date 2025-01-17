@@ -30,19 +30,26 @@ import com.orbits.paymentapp.helper.Dialogs
 import com.orbits.paymentapp.helper.Extensions.asDouble
 import com.orbits.paymentapp.helper.Global
 import com.orbits.paymentapp.helper.Global.showSnackBar
+import com.orbits.paymentapp.helper.PrefUtils.getAppConfig
 import com.orbits.paymentapp.helper.PrefUtils.getAppPassword
+import com.orbits.paymentapp.helper.PrefUtils.getClients
 import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
+import com.orbits.paymentapp.helper.PrefUtils.getService
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
 import com.orbits.paymentapp.helper.PrefUtils.isCodeVerified
 import com.orbits.paymentapp.helper.PrefUtils.isEnglishLanguage
 import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
+import com.orbits.paymentapp.helper.PrefUtils.setClientsData
 import com.orbits.paymentapp.helper.PrefUtils.setMasterKey
+import com.orbits.paymentapp.helper.PrefUtils.setServiceData
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
 import com.orbits.paymentapp.helper.ServerService
 import com.orbits.paymentapp.helper.TCPServer
 import com.orbits.paymentapp.helper.WebSocketClient
 import com.orbits.paymentapp.helper.helper_model.AppMasterKeyModel
+import com.orbits.paymentapp.helper.helper_model.ClientListDataModel
 import com.orbits.paymentapp.helper.helper_model.PasswordModel
+import com.orbits.paymentapp.helper.helper_model.ServiceDataModel
 import com.orbits.paymentapp.helper.helper_model.UserDataModel
 import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
@@ -62,7 +69,6 @@ import io.nearpay.sdk.utils.listeners.PurchaseListener
 import kotlinx.coroutines.DelicateCoroutinesApi
 import java.io.OutputStream
 import java.net.Socket
-import java.util.Locale
 import java.util.UUID
 
 class MainActivity : BaseActivity(), MessageListener {
@@ -104,39 +110,27 @@ class MainActivity : BaseActivity(), MessageListener {
 
 
         startServerService()
+        initializeSocket()
         initializeToolbar()
         initializeNearPay()
     }
 
     private fun startServerService(){
-        val serviceRunning = isServiceRunning(ServerService::class.java)
-        if (!serviceRunning){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    0
-                )
-            }
 
-            Intent(applicationContext, ServerService::class.java).also { intent ->
-                intent.action = ServerService.Actions.START.toString()
-                startService(intent)
-                println("here is service started")
-                initializeSocket()
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
         }
+        val intent = Intent(this@MainActivity, ServerService::class.java)
+        intent.action = ServerService.Actions.START.toString()
+        startService(intent)
+        println("Service started")
+
     }
 
-    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
-        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.name == service.service.className) {
-                return true
-            }
-        }
-        return false
-    }
 
     private fun initializeToolbar() {
         setUpToolbar(
@@ -203,15 +197,15 @@ class MainActivity : BaseActivity(), MessageListener {
 
     private fun initializeNearPay() {
         nearpay = NearPay.Builder()
-            .context(this)
+            .context(this@MainActivity)
             .authenticationData(AuthenticationData.Email("development@aflak.com.sa"))
             .environment(Environments.SANDBOX)
-            .locale(Locale.getDefault())
             .networkConfiguration(NetworkConfiguration.DEFAULT)
             .uiPosition(UIPosition.CENTER_BOTTOM)
             .paymentText(PaymentText("يرجى تمرير الطاقة", "please tap your card"))
             .loadingUi(true)
             .build()
+
     }
 
     private fun updateClientList(clients: List<String>) {
@@ -253,6 +247,11 @@ class MainActivity : BaseActivity(), MessageListener {
 
                 val code = clientModel.code
                 amount = clientModel.amount ?: ""
+                setServiceData(
+                    ServiceDataModel(
+                        amount = amount
+                    )
+                )
 
                 if (isCodeVerified()) {
                     if (code?.isEmpty() == true) {
@@ -295,19 +294,23 @@ class MainActivity : BaseActivity(), MessageListener {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    override fun onClientConnected(clientSocket: Socket?) {
+    override fun onClientConnected(clientSocket: Socket?, clientList: List<String>) {
         Thread {
             try {
                 outStream = clientSocket?.getOutputStream()
                 if (clientSocket != null) {
                     socket = clientSocket
-                    arrListKoiskClients.clear()
-                    arrListKoiskClients.addAll(tcpServer.arrListKoiskClients)
+                    setClientsData(
+                        ClientListDataModel(
+                            clientList = clientList
+                        )
+                    )
                     runOnUiThread {
-                        tcpServer.observeClientList().observe(this) { clients ->
-                            binding.root.showSnackBar("Client Connected")
-                            arrListClients.addAll(clients)
-                        }
+                        binding.root.showSnackBar("Client Connected")
+                        println("here is client list fahad ${clientList}")
+                        arrListClients.clear()
+                        arrListClients.addAll(clientList)
+                        println("here is client list fahad 111 ${arrListClients}")
                     }
                 }
                 println("Connected to server")
@@ -342,7 +345,8 @@ class MainActivity : BaseActivity(), MessageListener {
                     val jsonObject = JsonObject()
                     println("here is transaction data $transactionData")
                     jsonObject.add("transactionData", gson.toJsonTree(transactionData))
-                    sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
+                    println("here is client id 111 ${getClients()?.clientList?.lastOrNull() ?: ""}")
+                    sendMessageToWebSocketClient(getClients()?.clientList?.lastOrNull() ?: "", jsonObject)
                     moveTaskToBack(true)
                 }
 
@@ -357,7 +361,8 @@ class MainActivity : BaseActivity(), MessageListener {
                                 "transactionData",
                                 gson.toJsonTree(purchaseFailure.transactionData)
                             )
-                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
+                            println("here is client id 222 ${getClients()?.clientList?.lastOrNull() ?: ""}")
+                            sendMessageToWebSocketClient(getClients()?.clientList?.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
 
                         }
@@ -369,16 +374,19 @@ class MainActivity : BaseActivity(), MessageListener {
                             jsonObject.addProperty("status_message", "failure")
                             jsonObject.addProperty("description", purchaseFailure.message)
                             println("here is purchase rejected")
-                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
+                            println("here is client id 222 ${getClients()?.clientList?.lastOrNull() ?: ""}")
+                            sendMessageToWebSocketClient(getClients()?.clientList?.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
 
                         is PurchaseFailure.AuthenticationFailed -> {
                             nearpay.updateAuthentication(AuthenticationData.Jwt("JWT HERE"))
+                            println("here is 7777")
                             val jsonObject = JsonObject()
                             jsonObject.addProperty("status_message", "failure")
                             println("here is purchase rejected ${jsonObject}")
-                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
+                            println("here is client id 444 ${getClients()?.clientList?.lastOrNull() ?: ""}")
+                            sendMessageToWebSocketClient(getClients()?.clientList?.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
 
@@ -386,21 +394,28 @@ class MainActivity : BaseActivity(), MessageListener {
                             println("here is 4444")
                             val jsonObject = JsonObject()
                             jsonObject.addProperty("status_message", "failure")
-                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
+                            println("here is client id 555 ${getClients()?.clientList?.lastOrNull() ?: ""}")
+                            sendMessageToWebSocketClient(getClients()?.clientList?.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
 
                         is PurchaseFailure.GeneralFailure -> {
                             val jsonObject = JsonObject()
+                            println("here is locale ${getAppConfig()?.lang}")
+                            println("here is 555")
                             jsonObject.addProperty("status_message", "failure")
+                            println("here is client id 666 ${arrListClients.lastOrNull() ?: ""}")
                             sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
 
                         is PurchaseFailure.UserCancelled -> {
                             val jsonObject = JsonObject()
+
+                            println("here is 6666")
                             jsonObject.addProperty("status_message", "failure")
-                            sendMessageToWebSocketClient(arrListClients.lastOrNull() ?: "", jsonObject)
+                            println("here is client id 777 ${getClients()?.clientList?.lastOrNull() ?: ""}")
+                            sendMessageToWebSocketClient(getClients()?.clientList?.lastOrNull() ?: "", jsonObject)
                             moveTaskToBack(true)
                         }
                     }
@@ -442,9 +457,9 @@ class MainActivity : BaseActivity(), MessageListener {
 
         val customNotificationLayout = RemoteViews(context.packageName, R.layout.layout_notification).apply {
             if (isEnglishLanguage()){
-                setImageViewResource(R.id.txtTitle, R.drawable.ic_notification_img)
+                setImageViewResource(R.id.txtTitle, R.drawable.ic_notification_main)
             }else {
-                setImageViewResource(R.id.txtTitle, R.drawable.ic_ar_notification)
+                setImageViewResource(R.id.txtTitle, R.drawable.ic_notification_main)
             }
 
         }
@@ -496,8 +511,10 @@ class MainActivity : BaseActivity(), MessageListener {
         super.onNewIntent(intent)
         if (intent.hasExtra("notification")) {
             println("here is notification 111")
-            callPurchase(amount.asDouble())
+            println("here is amount $amount")
+            callPurchase(getService()?.amount?.toDouble() ?: 0.0)
         }
     }
+
 
 }

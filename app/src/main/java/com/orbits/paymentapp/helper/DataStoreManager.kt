@@ -7,14 +7,18 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
 import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.APP
+import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.CLIENTS
 import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.MASTER_KEY
 import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.PASSWORD
+import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.SERVICE
 import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.USER_REMEMBER_DATA
 import com.orbits.paymentapp.helper.DataStoreManager.PreferencesKeys.USER_RESPONSE_DATA
 import com.orbits.paymentapp.helper.helper_model.AppConfigModel
 import com.orbits.paymentapp.helper.helper_model.AppMasterKeyModel
+import com.orbits.paymentapp.helper.helper_model.ClientListDataModel
 import com.orbits.paymentapp.helper.helper_model.DeepLinkModel
 import com.orbits.paymentapp.helper.helper_model.PasswordModel
+import com.orbits.paymentapp.helper.helper_model.ServiceDataModel
 import com.orbits.paymentapp.helper.helper_model.StoreDataModel
 import com.orbits.paymentapp.helper.helper_model.UserRememberDataModel
 import com.orbits.paymentapp.helper.helper_model.UserResponseModel
@@ -34,7 +38,8 @@ class DataStoreManager(val context: Context) {
         val USER_REMEMBER_DATA = stringPreferencesKey("user_remember_data")
         val MASTER_KEY = stringPreferencesKey("master_key")
         val PASSWORD = stringPreferencesKey("password")
-        val STORE = stringPreferencesKey("store")
+        val SERVICE = stringPreferencesKey("service")
+        val CLIENTS = stringPreferencesKey("clients")
         val APP = stringPreferencesKey("application")
     }
 
@@ -93,6 +98,38 @@ class DataStoreManager(val context: Context) {
             val gson = Gson()
             val responseData = preferences[MASTER_KEY] ?: ""
             val dataObject = gson.fromJson(responseData, AppMasterKeyModel::class.java)
+            dataObject
+        }
+    }
+
+    suspend fun saveServiceData(responseModel: ServiceDataModel?) {
+        instance.edit { preferences ->
+            preferences[SERVICE] = Gson().toJson(responseModel)
+        }
+    }
+
+
+    fun getServiceData(): Flow<ServiceDataModel?> {
+        return instance.data.map { preferences ->
+            val gson = Gson()
+            val responseData = preferences[SERVICE] ?: ""
+            val dataObject = gson.fromJson(responseData, ServiceDataModel::class.java)
+            dataObject
+        }
+    }
+
+    suspend fun saveClientsData(responseModel: ClientListDataModel?) {
+        instance.edit { preferences ->
+            preferences[CLIENTS] = Gson().toJson(responseModel)
+        }
+    }
+
+
+    fun getClientsData(): Flow<ClientListDataModel?> {
+        return instance.data.map { preferences ->
+            val gson = Gson()
+            val responseData = preferences[CLIENTS] ?: ""
+            val dataObject = gson.fromJson(responseData, ClientListDataModel::class.java)
             dataObject
         }
     }

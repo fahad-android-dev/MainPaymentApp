@@ -90,7 +90,7 @@ class SettingsActivity : BaseActivity() {
             alertDialogInterface = object : AlertDialogInterface {
                 override fun onYesClick() {
                     LocaleHelper.changeLanguage(this@SettingsActivity)
-                    navigateToMain{}
+                    navigateToMain{finish()}
                 }
 
                 override fun onNoClick() {}

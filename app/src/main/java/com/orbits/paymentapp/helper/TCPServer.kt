@@ -8,6 +8,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.orbits.paymentapp.helper.Extensions.asInt
+import com.orbits.paymentapp.helper.PrefUtils.setClientsData
+import com.orbits.paymentapp.helper.helper_model.ClientListDataModel
 import com.orbits.paymentapp.interfaces.MessageListener
 import io.nearpay.sdk.utils.enums.TransactionData
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -33,7 +35,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
     private var serverSocket: ServerSocket? = null
     private val clients = HashMap<String, ClientHandler>()
     private val connectedClientsList = MutableLiveData<List<String>>()
-    val arrListKoiskClients = ArrayList<String>()
+    var arrListClients = ArrayList<String>()
 
     init {
         connectedClientsList.value = emptyList()
@@ -56,9 +58,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                 if (!clients.containsKey(clientHandler.clientId)) {
                     clients[clientHandler.clientId] = clientHandler
                     Thread(clientHandler).start()
-                    arrListKoiskClients.addAll(listOf(clientHandler.clientId))
                     addToConnectedClients(clientHandler.clientId)
-                    messageListener.onClientConnected(clientSocket)
 
 
                     // Add client to connectedClientsList
@@ -88,6 +88,8 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
             val currentList = connectedClientsList.value.orEmpty().toMutableList()
             currentList.add(clientId)
             println("here is list 1111 $currentList")
+            arrListClients.clear()
+            arrListClients.addAll(currentList)
             connectedClientsList.postValue(currentList)
         }
     }
@@ -196,6 +198,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                             println("Received WebSocket jsonObject from client $clientId: $message")
                             val jsonObject = Gson().fromJson(message, JsonObject::class.java)
                             messageListener.onMessageJsonReceived(jsonObject)
+                            messageListener.onClientConnected(clientSocket,arrListClients)
 
                             /*if (!jsonObject.isJsonNull){
                                 if (jsonObject.get("amount").asString.isNotEmpty()){

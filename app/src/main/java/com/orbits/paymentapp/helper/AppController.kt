@@ -18,7 +18,6 @@ class AppController : Application() {
             private set
         const val CHANNEL_ID = "1"
         const val CHANNEL_NAME = "Payment"
-        const val SERVICE_CHANNEL = "server_channel"
     }
 
     override fun onCreate() {
@@ -31,7 +30,7 @@ class AppController : Application() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_MAX // Set the importance to HIGH for high-priority notifications
+                NotificationManager.IMPORTANCE_HIGH // Set the importance to HIGH for high-priority notifications
             ).apply {
                 description = "Channel Description"
             }
@@ -58,7 +57,7 @@ class AppController : Application() {
             val channel = NotificationChannel(
                 "2",
                 "Server Running",
-                NotificationManager.IMPORTANCE_DEFAULT // Set the importance to HIGH for high-priority notifications
+                NotificationManager.IMPORTANCE_MIN // Set the importance to HIGH for high-priority notifications
             ).apply {
                 description = "Channel Description"
             }
